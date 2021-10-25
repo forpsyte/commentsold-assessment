@@ -37,7 +37,7 @@ class UserFactory extends Factory
             'shop_domain' => $this->faker->unique()->domainName,
             'is_enabled' => true,
             'billing_plan' => $this->faker->randomElement(['Enterprise', 'Boutique', 'Startup']),
-            'super_admin' => false,
+            'owner' => false,
         ];
     }
 

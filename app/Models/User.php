@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @inheritdoc
      */
     protected $casts = [
-        'super_admin' => 'boolean',
+        'owner' => 'boolean',
         'email_verified_at' => 'datetime',
     ];
 
@@ -31,7 +31,7 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
-        'super_admin',
+        'owner',
         'shop_name',
         'card_brand',
         'card_last_four',
@@ -146,8 +146,8 @@ class User extends Authenticatable
     public function scopeWhereRole($query, $role)
     {
         switch ($role) {
-            case 'user': return $query->where('super_admin', false);
-            case 'super_admin': return $query->where('super_admin', true);
+            case 'user': return $query->where('owner', false);
+            case 'owner': return $query->where('owner', true);
             default: return null;
         }
     }

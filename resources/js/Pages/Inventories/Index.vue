@@ -56,12 +56,12 @@
           </td>
           <td class="border-t">
             <div class="px-6 py-4 flex items-center focus:text-indigo-500">
-              {{ inventory.price }}
+              ${{ inventory.price }}
             </div>
           </td>
           <td class="border-t">
             <div class="px-6 py-4 flex items-center focus:text-indigo-500">
-              {{ inventory.cost }}
+              ${{ inventory.cost }}
             </div>
           </td>
         </tr>

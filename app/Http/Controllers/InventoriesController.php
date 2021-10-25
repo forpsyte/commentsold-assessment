@@ -29,8 +29,8 @@ class InventoriesController extends Controller
                         'quantity' => $inventory->quantity,
                         'color' => $inventory->color,
                         'size' => $inventory->size,
-                        'price' => $inventory->price_cents,
-                        'cost' => $inventory->cost_cents
+                        'price' => number_format(floatval($inventory->price_cents / 100), 2),
+                        'cost' => number_format(floatval($inventory->cost_cents / 100), 2)
                     ];
                 })
         ]);

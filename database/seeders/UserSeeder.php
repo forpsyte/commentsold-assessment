@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
                 'last_name' => array_shift($name),
                 'email' => $user['email'],
                 'password' => $user['password'],
-                'super_admin' => $user['super_admin'],
+                'owner' => $user['super_admin'],
                 'shop_name' => $user['shop_name'],
                 'card_brand' => $user['card_brand'],
                 'card_last_four' => $user['card_last_four'],
