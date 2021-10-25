@@ -1,0 +1,74 @@
+on:
+  push:
+    branches:
+      - main
+
+name: CommentSold Test Deployment
+
+jobs:
+  deploy:
+    name: Deploy Application to AWS
+    runs-on:  ubuntu-latest
+    env:
+      PATH_DEPLOY: ~/www/cs.jsimon.me/releases
+      BUILD_PATH:  ~/www/cs.jsimon.me/releases/build-${{ github.run_number }}
+      USER_WEB: ~/cs.jsimon.me
+      SHARED_FOLDER: ~/www/cs.jsimon.me/shared
+
+    steps:
+      -    uses: actions/checkout@master
+
+      -    name: Install dependencies
+           uses: php-actions/composer@v5
+           with:
+             php_version: 7.4
+             php_extensions: exif gd
+
+
+      -    name: Install node dependencies
+           uses: actions/setup-node@v2
+           with:
+             node-version: '12'
+             cache: 'npm'
+      -    run: npm install
+      -    run: npm run prod
+
+
+      -    name: Zip code
+           uses: montudor/action-zip@v0.1.0
+           with:
+             args: zip -qq -r deploy-sh.zip .
+
+
+      -    name: Copy zip  to AWS
+           uses: appleboy/scp-action@master
+           env:
+             HOST: ${{ secrets.SSH_HOST }}
+             USERNAME: ${{ secrets.SSH_USER }}
+             PORT: ${{ secrets.SSH_PORT }}
+             KEY: ${{ secrets.SSH_KEY }}
+           with:
+             source: "deploy-sh.zip"
+             target: ${{env.PATH_DEPLOY}}
+
+
+      -    name: Unzip upload folder on AWS
+           uses: appleboy/ssh-action@master
+           with:
+             HOST: ${{ secrets.SSH_HOST }}
+             USERNAME: ${{ secrets.SSH_USER }}
+             PORT: ${{ secrets.SSH_PORT }}
+             KEY: ${{ secrets.SSH_KEY }}
+             script: |
+               cd ${{env.PATH_DEPLOY}}
+               mkdir ${{ env.BUILD_PATH }} && cd ${{ env.BUILD_PATH }}
+               unzip -qq -o ../deploy-sh.zip
+               sudo rm -rf ../deploy-sh.zip
+               ln -sfn ${{env.SHARED_FOLDER}}/.env .
+               sudo chmod -R 777 storage/
+               sudo chown -R ${{ secrets.SYS_USER }}:${{ secrets.SYS_GROUP }} ${{ env.BUILD_PATH }}
+               php artisan cache:clear
+               php artisan migrate
+               ln -sfn  ${{ env.BUILD_PATH }} ${{ env.USER_WEB }}
+               cd ${{env.PATH_DEPLOY}}
+               ls -tp | grep 'release' | tail -n +3 | while IFS= read -r d; do sudo chown -R ubuntu:www-data "$d"; rm -rf "$d"; done
