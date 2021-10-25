@@ -8,19 +8,19 @@
     </div>
     <div class="mb-4">
       <inertia-link class="flex items-center group py-3" :href="route('orders')">
-        <icon name="printer" class="w-4 h-4 mr-2" :class="isUrl('orders') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
+        <icon name="store-front" class="w-4 h-4 mr-2" :class="isUrl('orders') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
         <div :class="isUrl('orders') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Orders</div>
       </inertia-link>
     </div>
     <div class="mb-4">
       <inertia-link class="flex items-center group py-3" :href="route('products')">
-        <icon name="printer" class="w-4 h-4 mr-2" :class="isUrl('products') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
+        <icon name="shopping-cart" class="w-4 h-4 mr-2" :class="isUrl('products') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
         <div :class="isUrl('products') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Products</div>
       </inertia-link>
     </div>
     <div class="mb-4">
       <inertia-link class="flex items-center group py-3" :href="route('inventory')">
-        <icon name="printer" class="w-4 h-4 mr-2" :class="isUrl('inventory') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
+        <icon name="book" class="w-4 h-4 mr-2" :class="isUrl('inventory') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
         <div :class="isUrl('inventory') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">Inventory</div>
       </inertia-link>
     </div>
