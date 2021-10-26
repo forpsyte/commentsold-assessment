@@ -59,7 +59,7 @@ export default {
   metaInfo: {title: 'Products'},
   components: {
     Icon,
-    Pagination
+    Pagination,
   },
   layout: Layout,
   props: {

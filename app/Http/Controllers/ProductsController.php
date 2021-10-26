@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
@@ -14,23 +14,28 @@ use Inertia\Response;
 class ProductsController extends Controller
 {
     /**
+     * @param \Illuminate\Http\Request $request
      * @return Response
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
+        $cacheTag = 'user.products.' . Auth::id();
+        $cacheKey = 'products.' . $request->get('page', '1');
         return Inertia::render('Products/Index', [
-            'products' => Auth::user()->products()
-                ->paginate(10)
-                ->withQueryString()
-                ->through(function($product){
-                    return [
-                        'id' => $product->id,
-                        'name' => $product->product_name,
-                        'style' => $product->style,
-                        'brand' => $product->brand,
-                        'skus' => implode(", ", $product->skus)
-                    ];
-                })
+            'products' => Cache::tags($cacheTag)->remember($cacheKey, 3600, function () {
+                return Auth::user()->products()
+                    ->paginate(10)
+                    ->withQueryString()
+                    ->through(function($product){
+                        return [
+                            'id' => $product->id,
+                            'name' => $product->product_name,
+                            'style' => $product->style,
+                            'brand' => $product->brand,
+                            'skus' => implode(", ", $product->skus)
+                        ];
+                    });
+            })
         ]);
     }
 
@@ -60,6 +65,7 @@ class ProductsController extends Controller
             ])
         );
 
+        Cache::tags('user.products.' . Auth::id())->flush();
         return Redirect::route('products')->with('success', 'Product created.');
     }
 
@@ -69,7 +75,7 @@ class ProductsController extends Controller
      */
     public function edit(Product $product)
     {
-        if (Auth::user()->id !== $product->user_id) {
+        if (Auth::id() !== $product->user_id) {
             return Redirect::route('products')->with('error', 'Product does not exist.');
         }
 
@@ -94,7 +100,7 @@ class ProductsController extends Controller
      */
     public function update(Product $product)
     {
-        if (Auth::user()->id !== $product->user_id) {
+        if (Auth::id() !== $product->user_id) {
             return Redirect::route('products')->with('error', 'Product does not exist.');
         }
 
@@ -111,6 +117,7 @@ class ProductsController extends Controller
             ])
         );
 
+        Cache::tags('user.products.' . Auth::id())->flush();
         return Redirect::back()->with('success', 'Product updated.');
     }
 
@@ -120,11 +127,12 @@ class ProductsController extends Controller
      */
     public function delete(Product $product)
     {
-        if (Auth::user()->id !== $product->user_id) {
+        if (Auth::id() !== $product->user_id) {
             return Redirect::route('products')->with('error', 'Product does not exist.');
         }
 
         $product->delete();
+        Cache::tags('user.products.' . Auth::id())->flush();
         return Redirect::route('products')->with('success', 'Product deleted.');
     }
 }
