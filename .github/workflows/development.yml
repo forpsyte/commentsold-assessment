@@ -70,6 +70,7 @@ jobs:
                sudo chmod -R 777 storage/
                sudo chown -R ${{ secrets.SYS_USER }}:${{ secrets.SYS_GROUP }} ${{ env.BUILD_PATH }}
                php artisan cache:clear
+               php artisan opcache:clear
                php artisan migrate
                ln -sfn  ${{ env.BUILD_PATH }} ${{ env.USER_WEB }}
                ln -sfn  ${{ env.BUILD_PATH }} ${{ env.WEB_ROOT }}

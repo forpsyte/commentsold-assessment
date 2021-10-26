@@ -9,6 +9,7 @@
         "ext-exif": "*",
         "ext-gd": "*",
         "ext-json": "*",
+        "appstract/laravel-opcache": "^4.0",
         "fakerphp/faker": "^1.9.1",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
