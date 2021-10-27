@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SaveProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProductsController extends Controller
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return Response
      */
-    public function index(\Illuminate\Http\Request $request)
+    public function index(Request $request)
     {
         $cacheTag = 'user.products.' . Auth::id();
         $cacheKey = 'products.' . $request->get('page', '1');
@@ -48,75 +50,43 @@ class ProductsController extends Controller
     }
 
     /**
+     * @param SaveProductRequest $request
      * @return RedirectResponse
      */
-    public function save()
+    public function save(SaveProductRequest $request)
     {
-        Auth::user()->products()->create(
-            Request::validate([
-                'product_name' => ['required', 'max:128'],
-                'description' => ['required', 'max:512'],
-                'style' => ['required', 'max:32'],
-                'brand' => ['required', 'max:32'],
-                'url' => ['nullable', 'max:256'],
-                'product_type' => ['required', 'max:255'],
-                'shipping_price' => ['required', 'integer'],
-                'note' => ['nullable', 'max:512']
-            ])
-        );
-
+        $validate = $request->validated();
+        Auth::user()->products()->create($validate);
         Cache::tags('user.products.' . Auth::id())->flush();
         return Redirect::route('products')->with('success', 'Product created.');
     }
 
     /**
+     * @param Request $request
      * @param Product $product
      * @return RedirectResponse|Response
      */
-    public function edit(Product $product)
+    public function edit(Request $request, Product $product)
     {
-        if (Auth::id() !== $product->user_id) {
+        if (!$request->user()->can('update', $product))
+        {
             return Redirect::route('products')->with('error', 'Product does not exist.');
         }
 
         return Inertia::render('Products/Edit', [
-            'product' => [
-                'id' => $product->id,
-                'name' => $product->product_name,
-                'description' => $product->description,
-                'style' => $product->style,
-                'brand' => $product->brand,
-                'url' => $product->url,
-                'type' => $product->product_type,
-                'shipping_price' => strval($product->shipping_price),
-                'note' => $product->note,
-            ]
+            'product' => $product->toArray()
         ]);
     }
 
     /**
+     * @param UpdateProductRequest $request
      * @param Product $product
      * @return RedirectResponse
      */
-    public function update(Product $product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        if (Auth::id() !== $product->user_id) {
-            return Redirect::route('products')->with('error', 'Product does not exist.');
-        }
-
-        $product->update(
-            Request::validate([
-                'product_name' => ['required', 'max:128'],
-                'description' => ['required', 'max:512'],
-                'style' => ['required', 'max:32'],
-                'brand' => ['required', 'max:32'],
-                'url' => ['nullable', 'max:256'],
-                'product_type' => ['required', 'max:255'],
-                'shipping_price' => ['required', 'integer'],
-                'note' => ['nullable', 'max:512']
-            ])
-        );
-
+        $validate = $request->validated();
+        $product->update($validate);
         Cache::tags('user.products.' . Auth::id())->flush();
         return Redirect::back()->with('success', 'Product updated.');
     }
@@ -125,9 +95,10 @@ class ProductsController extends Controller
      * @param Product $product
      * @return RedirectResponse
      */
-    public function delete(Product $product)
+    public function delete(Request $request, Product $product)
     {
-        if (Auth::id() !== $product->user_id) {
+        if (!$request->user()->can('update', $product))
+        {
             return Redirect::route('products')->with('error', 'Product does not exist.');
         }
 

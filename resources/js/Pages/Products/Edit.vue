@@ -54,12 +54,12 @@ export default {
     return {
       form: this.$inertia.form({
         _method: 'put',
-        product_name: this.product.name,
+        product_name: this.product.product_name,
         description: this.product.description,
         style: this.product.style,
         brand: this.product.brand,
         url: this.product.url,
-        product_type: this.product.type,
+        product_type: this.product.product_type,
         shipping_price: this.product.shipping_price,
         note: this.product.note,
       }),
