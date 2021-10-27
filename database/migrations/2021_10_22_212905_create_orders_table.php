@@ -15,8 +15,8 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('product_id')->index();
-            $table->integer('inventory_id')->index();
+            $table->foreignId('product_id')->references('id')->on('products')->index();
+            $table->foreignId('inventory_id')->references('id')->on('inventories')->index();
             $table->string('street_address', 128);
             $table->string('apartment', 32)->nullable();
             $table->string('city', 64);

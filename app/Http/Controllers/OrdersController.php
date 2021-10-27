@@ -14,12 +14,11 @@ class OrdersController extends Controller
      */
     public function index()
     {
-        $orders = Auth::user()->orders();
         $filter = Request::only(['search', 'status']);
         return Inertia::render('Orders/Index', [
-            'count' => $orders->filter($filter)->count(),
+            'count' => Auth::user()->orders()->filter($filter)->count(),
             'filters' => Request::all(['search', 'status']),
-            'orders' => $orders
+            'orders' => Auth::user()->orders()
                 ->filter($filter)
                 ->sort(Request::only(['sortBy', 'direction']))
                 ->paginate(10)
