@@ -92,6 +92,7 @@ class ProductsController extends Controller
     }
 
     /**
+     * @param Request $request
      * @param Product $product
      * @return RedirectResponse
      */
