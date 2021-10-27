@@ -69,10 +69,9 @@ jobs:
                sudo chmod -R 777 storage/
                sudo chown -R ${{ secrets.SYS_USER }}:${{ secrets.SYS_GROUP }} ${{ env.BUILD_PATH }}
                php artisan cache:clear
-               php artisan opcache:clear
                php artisan migrate
                ln -sfn  ${{ env.BUILD_PATH }} ${{ env.USER_WEB }}
                ln -sfn  ${{ env.BUILD_PATH }} ${{ env.WEB_ROOT }}
                cd ${{env.PATH_DEPLOY}}
-               ls -tp | grep 'release' | tail -n +3 | while IFS= read -r d; do sudo chown -R ubuntu:www-data "$d"; rm -rf "$d"; done
+               ls -tp | grep 'build' | tail -n +3 | while IFS= read -r d; do sudo chown -R ubuntu:www-data "$d"; rm -rf "$d"; done
 
